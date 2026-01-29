@@ -2,22 +2,11 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CashoutDto } from './dto/cashout.dto';
 import { RollDto } from './dto/roll.dto';
-
-interface SessionResponse {
-  sessionId: string;
-  credits: number;
-}
-
-interface RollResponse {
-  symbols: string[];
-  winAmount: number;
-  credits: number;
-}
-
-interface CashoutResponse {
-  finalCredits: number;
-  status: 'closed';
-}
+import type {
+  SessionResponse,
+  RollResponse,
+  CashoutResponse,
+} from './dto/game-response.dto';
 
 @Controller()
 export class GameController {
