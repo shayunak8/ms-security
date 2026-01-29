@@ -110,7 +110,7 @@ Consumes one credit from an **open** session, generates a 3-symbol roll, applies
 Fields:
 
 - **`symbols`**: array of three symbols, each one of:
-  - `"C"`, `"L"`, `"O"`, `"W"`, `"N"`
+  - `"C"`, `"L"`, `"O"`, `"W"`
 - **`winAmount`**: credits won for this roll (0 if losing roll)
 - **`credits`**: updated total credits after this roll
 
@@ -170,7 +170,7 @@ All cheating is performed **server-side** and **only after a winning roll** has 
 ### 1. Base roll
 
 1. Generate a 3-symbol roll:
-   - Each symbol is sampled independently from `["C", "L", "O", "W", "N"]`.
+   - Each symbol is sampled independently from `["C", "L", "O", "W"]`.
 2. Check if the roll is a winning roll (all 3 symbols identical).
 
 ### 2. Cheating thresholds
@@ -206,7 +206,6 @@ When a roll is winning (all three symbols are the same), the payout depends on t
 - `"L"` → `20` credits
 - `"O"` → `30` credits
 - `"W"` → `40` credits
-- `"N"` → `40` credits
 
 Only three-of-a-kind pays out; any mixed combination yields `winAmount = 0`.
 
@@ -236,7 +235,7 @@ Tests are deterministic by injecting custom random functions into pure logic whe
 - **Error format**:
   - Default NestJS error JSON is used (`statusCode`, `message`, `error`).
 - **Validation**:
-  - Minimal DTO validation; the controller relies on correct `sessionId` shape from the client.
+  - Requests are validated via Nest global `ValidationPipe` and DTOs (`sessionId` must be a UUID).
   - Unknown or closed sessions are always handled gracefully with 4xx errors.
 - **Cheating randomness**:
   - Only **one** re-roll is ever performed per winning spin, to keep behavior predictable.
