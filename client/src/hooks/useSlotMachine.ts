@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cashout, createSession, roll } from '../api/client';
 import type { SlotSymbol } from '../types/api';
+import { parseApiError } from '../utils/errorHandler';
 
 interface UseSlotMachineState {
   readonly sessionId: string | null;
@@ -51,10 +52,10 @@ export function useSlotMachine(): UseSlotMachineResult {
       const response = await createSession();
       setSessionId(response.sessionId);
       setCredits(response.credits);
+      setError(null);
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Failed to create session';
-      setError(message);
+      const apiError = parseApiError(e);
+      setError(apiError.message);
     } finally {
       setIsLoadingSession(false);
     }
@@ -90,10 +91,13 @@ export function useSlotMachine(): UseSlotMachineResult {
 
       timeoutsRef.current.push(t1, t2, t3);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to roll';
-      setError(message);
+      const apiError = parseApiError(e);
+      setError(apiError.message);
       setIsRolling(false);
       setSymbols(INITIAL_SYMBOLS);
+      // Clear any pending timeouts on error
+      timeoutsRef.current.forEach((id) => window.clearTimeout(id));
+      timeoutsRef.current = [];
     }
   }, [isRolling, isSessionClosed, sessionId]);
 
@@ -107,9 +111,10 @@ export function useSlotMachine(): UseSlotMachineResult {
       const response = await cashout(sessionId);
       setCredits(response.finalCredits);
       setIsSessionClosed(true);
+      setError(null);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to cash out';
-      setError(message);
+      const apiError = parseApiError(e);
+      setError(apiError.message);
     }
   }, [isRolling, isSessionClosed, sessionId]);
 

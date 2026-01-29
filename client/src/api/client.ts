@@ -15,33 +15,46 @@ async function request<TResponse>(
 ): Promise<TResponse> {
   const url = `${API_BASE_URL}${path}`;
 
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers ?? {}),
-    },
-    ...init,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+      ...init,
+    });
+  } catch (error) {
+    // Network error (fetch failed)
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('NetworkError: Failed to fetch');
+    }
+    throw error;
+  }
 
   if (!response.ok) {
+    let errorMessage = `${response.status} ${response.statusText}`;
+
     try {
       const data = (await response.json()) as {
         message?: string | string[];
+        statusCode?: number;
       };
 
-      const messageArray = Array.isArray(data.message)
-        ? data.message
-        : data.message
-          ? [data.message]
-          : [];
-
-      const message =
-        messageArray.join(', ') || `${response.status} ${response.statusText}`;
-
-      throw new Error(message);
+      if (data.message) {
+        const messageArray = Array.isArray(data.message)
+          ? data.message
+          : [data.message];
+        errorMessage = messageArray.join(', ');
+      }
     } catch {
-      throw new Error(`${response.status} ${response.statusText}`);
+      // If JSON parsing fails, use the status text
     }
+
+    const error = new Error(errorMessage);
+    (error as Error & { statusCode?: number }).statusCode = response.status;
+    throw error;
   }
 
   return (await response.json()) as TResponse;
