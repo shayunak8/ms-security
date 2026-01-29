@@ -1,13 +1,11 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { GameService } from './game.service';
+import { CashoutDto } from './dto/cashout.dto';
+import { RollDto } from './dto/roll.dto';
 
 interface SessionResponse {
   sessionId: string;
   credits: number;
-}
-
-interface RollRequestDto {
-  sessionId: string;
 }
 
 interface RollResponse {
@@ -16,13 +14,9 @@ interface RollResponse {
   credits: number;
 }
 
-interface CashoutRequestDto {
-  sessionId: string;
-}
-
 interface CashoutResponse {
   finalCredits: number;
-  status: string;
+  status: 'closed';
 }
 
 @Controller()
@@ -41,7 +35,7 @@ export class GameController {
 
   @Post('roll')
   @HttpCode(HttpStatus.OK)
-  roll(@Body() body: RollRequestDto): RollResponse {
+  roll(@Body() body: RollDto): RollResponse {
     const result = this.gameService.roll(body.sessionId);
     return {
       symbols: result.symbols,
@@ -52,7 +46,7 @@ export class GameController {
 
   @Post('cashout')
   @HttpCode(HttpStatus.OK)
-  cashout(@Body() body: CashoutRequestDto): CashoutResponse {
+  cashout(@Body() body: CashoutDto): CashoutResponse {
     const result = this.gameService.cashout(body.sessionId);
     return {
       finalCredits: result.finalCredits,
