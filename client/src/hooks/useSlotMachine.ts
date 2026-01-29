@@ -6,7 +6,6 @@ interface UseSlotMachineState {
   readonly sessionId: string | null;
   readonly credits: number;
   readonly symbols: (SlotSymbol | 'X')[];
-  readonly lastWinAmount: number | null;
   readonly isRolling: boolean;
   readonly isSessionClosed: boolean;
   readonly isLoadingSession: boolean;
@@ -28,7 +27,6 @@ export function useSlotMachine(): UseSlotMachineResult {
   const [credits, setCredits] = useState<number>(0);
   const [symbols, setSymbols] =
     useState<(SlotSymbol | 'X')[]>(INITIAL_SYMBOLS);
-  const [lastWinAmount, setLastWinAmount] = useState<number | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [isSessionClosed, setIsSessionClosed] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -47,7 +45,6 @@ export function useSlotMachine(): UseSlotMachineResult {
     setIsLoadingSession(true);
     setError(null);
     setIsSessionClosed(false);
-    setLastWinAmount(null);
     setSymbols(INITIAL_SYMBOLS);
 
     try {
@@ -70,7 +67,6 @@ export function useSlotMachine(): UseSlotMachineResult {
 
     setIsRolling(true);
     setError(null);
-    setLastWinAmount(null);
     setSymbols(INITIAL_SYMBOLS);
 
     try {
@@ -89,7 +85,6 @@ export function useSlotMachine(): UseSlotMachineResult {
       const t3 = window.setTimeout(() => {
         setSymbols([s1, s2, s3]);
         setCredits(response.credits);
-        setLastWinAmount(response.winAmount);
         setIsRolling(false);
       }, 3000);
 
@@ -122,7 +117,6 @@ export function useSlotMachine(): UseSlotMachineResult {
     sessionId,
     credits,
     symbols,
-    lastWinAmount,
     isRolling,
     isSessionClosed,
     isLoadingSession,
