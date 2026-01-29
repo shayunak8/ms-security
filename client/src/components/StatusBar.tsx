@@ -4,11 +4,7 @@ interface StatusBarProps {
   readonly error: string | null;
 }
 
-export function StatusBar({
-  credits,
-  isSessionClosed,
-  error,
-}: StatusBarProps) {
+export function StatusBar({ credits, isSessionClosed, error }: StatusBarProps) {
   return (
     <div className="StatusBar">
       <div className="StatusBar-credits">
