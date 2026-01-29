@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { cashout, createSession, roll } from '../api/client';
-import type { SlotSymbol } from '../types/api';
-import { parseApiError } from '../utils/errorHandler';
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { cashout, createSession, roll } from "../api/api";
+import type { SlotSymbol } from "../types/api";
+import { parseApiError } from "../utils/errorHandler";
+import { ANIMATION_DURATION, INITIAL_STATE } from "../constants";
 
 interface UseSlotMachineState {
   readonly sessionId: string | null;
   readonly credits: number;
-  readonly symbols: (SlotSymbol | 'X')[];
+  readonly symbols: (SlotSymbol | "X")[];
   readonly isRolling: boolean;
   readonly isSessionClosed: boolean;
   readonly isLoadingSession: boolean;
@@ -21,13 +22,12 @@ interface UseSlotMachineActions {
 
 export type UseSlotMachineResult = UseSlotMachineState & UseSlotMachineActions;
 
-const INITIAL_SYMBOLS: (SlotSymbol | 'X')[] = ['X', 'X', 'X'];
+const INITIAL_SYMBOLS: (SlotSymbol | "X")[] = ["X", "X", "X"];
 
 export function useSlotMachine(): UseSlotMachineResult {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [credits, setCredits] = useState<number>(0);
-  const [symbols, setSymbols] =
-    useState<(SlotSymbol | 'X')[]>(INITIAL_SYMBOLS);
+  const [symbols, setSymbols] = useState<(SlotSymbol | "X")[]>(INITIAL_SYMBOLS);
   const [isRolling, setIsRolling] = useState(false);
   const [isSessionClosed, setIsSessionClosed] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -76,18 +76,22 @@ export function useSlotMachine(): UseSlotMachineResult {
       const [s1, s2, s3] = response.symbols;
 
       const t1 = window.setTimeout(() => {
-        setSymbols([s1, 'X', 'X']);
-      }, 1000);
+        setSymbols([
+          s1,
+          INITIAL_STATE.SPINNING_SYMBOL,
+          INITIAL_STATE.SPINNING_SYMBOL,
+        ]);
+      }, ANIMATION_DURATION.REEL_1_REVEAL);
 
       const t2 = window.setTimeout(() => {
-        setSymbols([s1, s2, 'X']);
-      }, 2000);
+        setSymbols([s1, s2, INITIAL_STATE.SPINNING_SYMBOL]);
+      }, ANIMATION_DURATION.REEL_2_REVEAL);
 
       const t3 = window.setTimeout(() => {
         setSymbols([s1, s2, s3]);
         setCredits(response.credits);
         setIsRolling(false);
-      }, 3000);
+      }, ANIMATION_DURATION.REEL_3_REVEAL);
 
       timeoutsRef.current.push(t1, t2, t3);
     } catch (e) {
@@ -118,17 +122,31 @@ export function useSlotMachine(): UseSlotMachineResult {
     }
   }, [isRolling, isSessionClosed, sessionId]);
 
-  return {
-    sessionId,
-    credits,
-    symbols,
-    isRolling,
-    isSessionClosed,
-    isLoadingSession,
-    error,
-    startSession,
-    rollOnce,
-    cashoutSession,
-  };
+  // Memoize the return object to prevent unnecessary re-renders of consumers
+  return useMemo(
+    () => ({
+      sessionId,
+      credits,
+      symbols,
+      isRolling,
+      isSessionClosed,
+      isLoadingSession,
+      error,
+      startSession,
+      rollOnce,
+      cashoutSession,
+    }),
+    [
+      sessionId,
+      credits,
+      symbols,
+      isRolling,
+      isSessionClosed,
+      isLoadingSession,
+      error,
+      startSession,
+      rollOnce,
+      cashoutSession,
+    ],
+  );
 }
-
