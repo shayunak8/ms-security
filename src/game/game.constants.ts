@@ -17,6 +17,5 @@ export const SYMBOL_PAYOUT: Record<Symbol, number> = {
   L: 20,
   O: 30,
   W: 40,
-  N: 40,
 };
 

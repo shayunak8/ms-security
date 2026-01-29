@@ -2,11 +2,21 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { GameService } from './game.service';
 import { INITIAL_CREDITS } from './game.constants';
 
+function createDeterministicRandom(sequence: number[]): () => number {
+  let index = 0;
+  return () => {
+    const value = sequence[index % sequence.length]!;
+    index += 1;
+    return value;
+  };
+}
+
 describe('GameService', () => {
   let service: GameService;
 
   beforeEach(() => {
-    service = new GameService();
+    // Default: a deterministic random that produces a losing pattern: C, L, O
+    service = new GameService(createDeterministicRandom([0, 0.34, 0.67]));
   });
 
   it('creates a new session with initial credits', () => {
@@ -22,23 +32,16 @@ describe('GameService', () => {
     const beforeCredits = session.credits;
 
     const result = service.roll(session.id);
-    expect(result.credits).toBeLessThanOrEqual(beforeCredits + 40); // upper bound with max payout
+    // Losing pattern => -1 credit after roll
+    expect(result.credits).toBe(beforeCredits - 1);
   });
 
   it('prevents rolling with insufficient credits', () => {
     const session = service.createSession();
 
-    // Drain credits to 0
-    while (true) {
-      const current = service.getSession(session.id);
-      if (current.credits <= 0) {
-        break;
-      }
-      try {
-        service.roll(session.id);
-      } catch {
-        break;
-      }
+    // Drain credits deterministically to 0 (always losing)
+    for (let i = 0; i < INITIAL_CREDITS; i += 1) {
+      service.roll(session.id);
     }
 
     expect(() => service.roll(session.id)).toThrow(BadRequestException);

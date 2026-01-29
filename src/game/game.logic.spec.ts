@@ -6,7 +6,12 @@ import {
   performRoll,
 } from './game.logic';
 import { SYMBOLS } from './game.types';
-import { CHEAT_THRESHOLD_LOW, CHEAT_THRESHOLD_HIGH, ROLL_COST } from './game.constants';
+import {
+  CHEAT_THRESHOLD_LOW,
+  CHEAT_THRESHOLD_HIGH,
+  ROLL_COST,
+  SYMBOL_PAYOUT,
+} from './game.constants';
 
 function createDeterministicRandom(sequence: number[]): () => number {
   let index = 0;
@@ -47,7 +52,7 @@ describe('game logic', () => {
     const winningSymbol = SYMBOLS[0]!;
     const roll = [winningSymbol, winningSymbol, winningSymbol];
     const winAmount = calculateWinAmount(roll);
-    expect(winAmount).toBeGreaterThan(0);
+    expect(winAmount).toBe(SYMBOL_PAYOUT[winningSymbol]);
   });
 
   it('applyCheatingIfNeeded does not change losing rolls regardless of credits', () => {
