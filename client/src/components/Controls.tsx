@@ -1,4 +1,4 @@
-import './Controls.css';
+import "./Controls.css";
 
 interface ControlsProps {
   readonly onStart: () => void;
