@@ -1,3 +1,5 @@
+import './Controls.css';
+
 interface ControlsProps {
   readonly onStart: () => void;
   readonly onRoll: () => void;
@@ -21,18 +23,29 @@ export function Controls({
   const canCashout = hasSession && !isRolling && !isSessionClosed;
 
   return (
-    <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+    <div className="Controls">
       <button
         type="button"
+        className="Controls-button Controls-button--primary"
         onClick={onStart}
         disabled={isLoadingSession || isRolling}
       >
-        {isLoadingSession ? 'Starting…' : 'Start Game'}
+        {isLoadingSession ? "Starting…" : "Start Game"}
       </button>
-      <button type="button" onClick={onRoll} disabled={!canRoll}>
-        {isRolling ? 'Rolling…' : 'Roll'}
+      <button
+        type="button"
+        className="Controls-button Controls-button--secondary"
+        onClick={onRoll}
+        disabled={!canRoll}
+      >
+        {isRolling ? "Rolling…" : "Roll"}
       </button>
-      <button type="button" onClick={onCashout} disabled={!canCashout}>
+      <button
+        type="button"
+        className="Controls-button Controls-button--accent"
+        onClick={onCashout}
+        disabled={!canCashout}
+      >
         Cash Out
       </button>
     </div>

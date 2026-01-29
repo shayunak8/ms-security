@@ -1,15 +1,14 @@
-import './App.css';
-import { Controls } from './components/Controls';
-import { SlotReels } from './components/SlotReels';
-import { StatusBar } from './components/StatusBar';
-import { useSlotMachine } from './hooks/useSlotMachine';
+import "./App.css";
+import { Controls } from "./components/Controls";
+import { SlotReels } from "./components/SlotReels";
+import { StatusBar } from "./components/StatusBar";
+import { useSlotMachine } from "./hooks/useSlotMachine";
 
 function App() {
   const {
     sessionId,
     credits,
     symbols,
-    lastWinAmount,
     isRolling,
     isSessionClosed,
     isLoadingSession,
@@ -26,8 +25,6 @@ function App() {
 
         <StatusBar
           credits={credits}
-          lastWinAmount={lastWinAmount}
-          sessionId={sessionId}
           isSessionClosed={isSessionClosed}
           error={error}
         />
