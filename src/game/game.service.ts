@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Inject,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { INITIAL_CREDITS } from './game.constants';
-import type { RollResult, Session, SessionStatus } from './game.types';
+import type { RandomFn, RollResult, Session, SessionStatus } from './game.types';
 import { performRoll } from './game.logic';
+import { RANDOM_FN } from './game.di';
 
 interface MutableSession {
   id: string;
@@ -15,6 +21,8 @@ interface MutableSession {
 @Injectable()
 export class GameService {
   private readonly sessions = new Map<string, MutableSession>();
+
+  constructor(@Inject(RANDOM_FN) private readonly random: RandomFn) {}
 
   createSession(): Session {
     const now = new Date();
@@ -60,7 +68,7 @@ export class GameService {
       throw new BadRequestException('Insufficient credits');
     }
 
-    const result = performRoll(session.credits);
+    const result = performRoll(session.credits, this.random);
 
     session.credits = result.credits;
     session.updatedAt = new Date();
@@ -68,14 +76,14 @@ export class GameService {
     return result;
   }
 
-  cashout(sessionId: string): { finalCredits: number; status: SessionStatus } {
+  cashout(sessionId: string): { finalCredits: number; status: 'closed' } {
     const session = this.getOpenSessionOrThrow(sessionId);
     session.status = 'closed';
     session.updatedAt = new Date();
 
     return {
       finalCredits: session.credits,
-      status: session.status,
+      status: 'closed',
     };
   }
 }

@@ -1,4 +1,4 @@
-export const SYMBOLS = ['C', 'L', 'O', 'W', 'N'] as const;
+export const SYMBOLS = ['C', 'L', 'O', 'W'] as const;
 
 export type Symbol = (typeof SYMBOLS)[number];
 
