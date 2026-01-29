@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <linearGradient id="watermelonRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fecaca"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="80" height="80" rx="16" fill="#111827"/>
+  <path d="M20 52 C20 32 60 32 60 52 Z" fill="url(#watermelonRed)" stroke="#b91c1c" stroke-width="3" />
+  <path d="M20 52 C20 56 60 56 60 52" fill="#16a34a" stroke="#15803d" stroke-width="3" />
+  <circle cx="30" cy="46" r="2" fill="#111827" />
+  <circle cx="40" cy="44" r="2" fill="#111827" />
+  <circle cx="50" cy="46" r="2" fill="#111827" />
+</svg>
+

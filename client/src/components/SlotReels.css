@@ -44,7 +44,7 @@
 }
 
 .SlotReel--spinning {
-  animation: spin 0.5s linear infinite;
+  animation: spin 1.2s linear infinite;
   background: linear-gradient(145deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
   color: #667eea;
 }
@@ -74,4 +74,16 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.SlotReel-image {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+.SlotReel-placeholder {
+  font-size: 40px;
+  font-weight: 700;
+  color: #4b5563;
 }
