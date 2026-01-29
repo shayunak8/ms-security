@@ -1,3 +1,4 @@
+import { memo } from "react";
 import "./Controls.css";
 
 interface ControlsProps {
@@ -10,7 +11,7 @@ interface ControlsProps {
   readonly isSessionClosed: boolean;
 }
 
-export function Controls({
+function Controls({
   onStart,
   onRoll,
   onCashout,
@@ -51,3 +52,5 @@ export function Controls({
     </div>
   );
 }
+
+export default memo(Controls);

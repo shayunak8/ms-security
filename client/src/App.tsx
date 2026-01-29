@@ -1,7 +1,8 @@
 import "./App.css";
-import { Controls } from "./components/Controls";
-import { SlotReels } from "./components/SlotReels";
-import { StatusBar } from "./components/StatusBar";
+import { lazy, Suspense } from "react";
+import Controls from "./components/Controls";
+const SlotReels = lazy(() => import("./components/SlotReels"));
+const StatusBar = lazy(() => import("./components/StatusBar"));
 import { useSlotMachine } from "./hooks/useSlotMachine";
 
 function App() {
@@ -23,13 +24,23 @@ function App() {
       <main className="App-main">
         <h1 className="App-title">Casino Jackpot</h1>
 
-        <StatusBar
-          credits={credits}
-          isSessionClosed={isSessionClosed}
-          error={error}
-        />
+        <Suspense
+          fallback={
+            <div className="StatusBar-placeholder">Loading status…</div>
+          }
+        >
+          <StatusBar
+            credits={credits}
+            isSessionClosed={isSessionClosed}
+            error={error}
+          />
+        </Suspense>
 
-        <SlotReels symbols={symbols} />
+        <Suspense
+          fallback={<div className="SlotReels-placeholder">Loading reels…</div>}
+        >
+          <SlotReels symbols={symbols} />
+        </Suspense>
 
         <Controls
           onStart={startSession}

@@ -1,34 +1,35 @@
-import './SlotReels.css';
-import type { SlotSymbol } from '../types/api';
+import { memo } from "react";
+import "./SlotReels.css";
+import type { SlotSymbol } from "../types/api";
 
 interface SlotReelsProps {
   readonly symbols: (SlotSymbol | "X")[];
 }
 
 const FRUIT_IMAGE_BY_SYMBOL: Record<SlotSymbol, string> = {
-  C: '/fruits/cherry.svg',
-  L: '/fruits/lemon.svg',
-  O: '/fruits/orange.svg',
-  W: '/fruits/watermelon.svg',
+  C: "/fruits/cherry.svg",
+  L: "/fruits/lemon.svg",
+  O: "/fruits/orange.svg",
+  W: "/fruits/watermelon.svg",
 };
 
 const FRUIT_LABEL_BY_SYMBOL: Record<SlotSymbol, string> = {
-  C: 'Cherry',
-  L: 'Lemon',
-  O: 'Orange',
-  W: 'Watermelon',
+  C: "Cherry",
+  L: "Lemon",
+  O: "Orange",
+  W: "Watermelon",
 };
 
-export function SlotReels({ symbols }: SlotReelsProps) {
+function SlotReels({ symbols }: SlotReelsProps) {
   return (
     <div className="SlotReels">
       {symbols.map((symbol, index) => (
         <div
           key={index}
-          className={`SlotReel ${symbol === 'X' ? 'SlotReel--spinning' : ''}`}
+          className={`SlotReel ${symbol === "X" ? "SlotReel--spinning" : ""}`}
           data-testid={`reel-${index}`}
         >
-          {symbol === 'X' ? (
+          {symbol === "X" ? (
             <span className="SlotReel-placeholder">X</span>
           ) : (
             <img
@@ -42,3 +43,5 @@ export function SlotReels({ symbols }: SlotReelsProps) {
     </div>
   );
 }
+
+export default memo(SlotReels);

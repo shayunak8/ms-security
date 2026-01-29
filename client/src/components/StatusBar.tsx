@@ -1,10 +1,12 @@
+import { memo } from "react";
+
 interface StatusBarProps {
   readonly credits: number;
   readonly isSessionClosed: boolean;
   readonly error: string | null;
 }
 
-export function StatusBar({ credits, isSessionClosed, error }: StatusBarProps) {
+function StatusBar({ credits, isSessionClosed, error }: StatusBarProps) {
   return (
     <div className="StatusBar">
       <div className="StatusBar-credits">
@@ -22,3 +24,5 @@ export function StatusBar({ credits, isSessionClosed, error }: StatusBarProps) {
     </div>
   );
 }
+
+export default memo(StatusBar);
