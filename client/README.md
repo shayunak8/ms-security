@@ -1,73 +1,106 @@
-# React + TypeScript + Vite
+# Slot Machine Client (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend client for the casino slot machine assignment.
+It is implemented with **Vite + React + TypeScript** and integrates with the NestJS backend under `../server`.
 
-Currently, two official plugins are available:
+The client is intentionally small and focused:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Single-page UI with a 3-slot row
+- All game logic handled by the backend
+- Typed API layer
+- Basic Jest + React Testing Library coverage
 
-## React Compiler
+## Architecture
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- `src/main.tsx` – React entry point, renders `<App />` to `#root`.
+- `src/App.tsx` – top-level composition:
+  - Wires up the `useSlotMachine` hook.
+  - Renders status, reels, and controls.
+- `src/hooks/useSlotMachine.ts` – client-side orchestration:
+  - Creates and tracks the current session (`sessionId`, `credits`, `isSessionClosed`).
+  - Invokes backend API for `/session`, `/roll`, `/cashout`.
+  - Drives spinning state (`X`) and delayed reveal using `setTimeout`.
+- `src/api/client.ts` – typed API layer:
+  - `createSession()`, `roll(sessionId)`, `cashout(sessionId)`.
+  - Uses `VITE_API_BASE_URL` to determine backend base URL.
+  - Centralizes error handling and always throws `Error` with a clean message.
+- `src/types/api.ts` – shared API types:
+  - `SlotSymbol = 'C' | 'L' | 'O' | 'W'`
+  - `SessionResponse`, `RollResponse`, `CashoutResponse`.
+- `src/components/` – presentational components:
+  - `SlotReels` – displays 3 blocks in a row (letters or `X`).
+  - `Controls` – Start / Roll / Cash Out buttons with proper disabled states.
+  - `StatusBar` – session ID, credits, last win, and error display.
 
-## Expanding the ESLint configuration
+All credits, win detection, and cheating logic live **only** on the backend.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## API Integration
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The client talks to the backend via:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Environment variable**: `VITE_API_BASE_URL`
+- Default (if unset): `http://localhost:3000`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+File:
+
+- `.env.example`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Requests are made to:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `POST ${VITE_API_BASE_URL}/session`
+- `POST ${VITE_API_BASE_URL}/roll`
+- `POST ${VITE_API_BASE_URL}/cashout`
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The client never re-computes wins or credits; it always trusts the backend’s `winAmount` and `credits`.
+
+## Running Client and Server
+
+From the repository root:
+
+```bash
+# Backend
+cd server
+npm install
+npm run start:dev
+
+# Frontend
+cd ../client
+npm install
+cp .env.example .env    # or create .env manually
+npm run dev
 ```
+
+Then open the URL printed by Vite (typically `http://localhost:5173`).
+
+## Testing
+
+The client uses **Jest + React Testing Library**:
+
+- Config: `jest.config.cjs`
+- Setup: `src/setupTests.ts`
+
+Current coverage:
+
+- `src/__tests__/App.session.test.tsx`
+  - Verifies that starting a game (mocked `POST /session`) displays credits from the server.
+
+Run tests:
+
+```bash
+cd client
+npm test
+```
+
+## Build
+
+Before merging the client feature branch, ensure the build passes:
+
+```bash
+cd client
+npm run build
+```
+
